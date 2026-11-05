@@ -1,0 +1,27 @@
+{
+  "name": "Serenity 3D Studio skill",
+  "skills": [
+    {
+      "name": "serenity-3d-studio",
+      "version": "6efad58b42e8",
+      "description": "Build a bilingual, static Three.js mind-watching studio: 20 guided observer scripts, cloud/stream/orb worlds, cognitive-defusion logging, Web Speech narration, Web Audio gong and ambience, scaled session timing, local persistence, headless verification and a GitHub Pages release.",
+      "license": "MIT",
+      "files": [
+        "ATTRIBUTION.md",
+        "LICENSE",
+        "README.md",
+        "SKILL.md",
+        "assets/preview.png",
+        "assets/reference/index.html",
+        "assets/reference/script.js",
+        "assets/reference/scripts/verify-browser.mjs",
+        "assets/reference/style.css",
+        "references/lessons.md",
+        "references/method.md",
+        "references/release.md",
+        "references/verification.md",
+        "scripts/scaffold.mjs"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Serenity 3D — The Observer &amp; Mind-Watching Studio</title>
+<meta name="description" content="A bilingual 3D mind-watching studio for cognitive defusion: watch thoughts as clouds, leaves on a stream, or a breathing orb. Twenty guided scripts, synthesized gong, ambient soundscapes and a private local log.">
+<meta name="theme-color" content="#0a1220">
+<meta property="og:title" content="Serenity 3D — The Observer &amp; Mind-Watching Studio">
+<meta property="og:description" content="Step back into the observer stance. Twenty bilingual guided practices in a calm, interactive 3D world.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23c9f7ff'/%3E%3Cstop offset='.55' stop-color='%2367c7e8'/%3E%3Cstop offset='1' stop-color='%23224f7a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230a1220'/%3E%3Ccircle cx='32' cy='30' r='17' fill='url(%23g)'/%3E%3Cellipse cx='32' cy='50' rx='21' ry='4' fill='%2367c7e8' opacity='.35'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="stage" aria-hidden="true">
+  <canvas id="scene-canvas"></canvas>
+  <div class="stage-vignette"></div>
+</div>
+
+<a class="skip-link" href="#mainHud" data-i18n="skip">Skip to session controls</a>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-orb" aria-hidden="true"></span>
+    <div class="brand-text">
+      <h1>Serenity 3D</h1>
+      <p data-i18n="brandSub">The Observer &amp; Mind-Watching Studio</p>
+    </div>
+  </div>
+
+  <nav class="mode-tabs" aria-label="Visualization mode">
+    <button class="mode-btn is-active" data-mode="sky" aria-pressed="true">
+      <span aria-hidden="true">☁️</span><span data-i18n="modeSky">Clouds</span>
+    </button>
+    <button class="mode-btn" data-mode="stream" aria-pressed="false">
+      <span aria-hidden="true">🍂</span><span data-i18n="modeStream">Stream</span>
+    </button>
+    <button class="mode-btn" data-mode="sanctuary" aria-pressed="false">
+      <span aria-hidden="true">🪐</span><span data-i18n="modeOrb">Orb</span>
+    </button>
+  </nav>
+
+  <div class="top-actions">
+    <button id="libraryToggle" class="icon-btn mobile-only" aria-label="Open practice library" aria-expanded="false">
+      <span aria-hidden="true">☰</span>
+    </button>
+    <button id="langBtn" class="pill-btn" aria-label="Switch language">
+      <span aria-hidden="true">🌐</span><span id="langLabel">ไทย</span>
+    </button>
+    <button id="soundBtn" class="icon-btn" aria-label="Toggle narration sound" aria-pressed="true">
+      <span id="soundIcon" aria-hidden="true">🔊</span>
+    </button>
+    <button id="settingsBtn" class="icon-btn" aria-label="Open settings" aria-haspopup="dialog">
+      <span aria-hidden="true">⚙️</span>
+    </button>
+    <button id="helpBtn" class="icon-btn" aria-label="Open help" aria-haspopup="dialog">
+      <span aria-hidden="true">?</span>
+    </button>
+    <button id="logToggle" class="icon-btn mobile-only" aria-label="Open observer log" aria-expanded="false">
+      <span aria-hidden="true">📝</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <aside id="libraryPanel" class="panel panel-left" aria-label="Practice library">
+    <div class="panel-head">
+      <h2 data-i18n="libraryTitle">Practice Library</h2>
+      <button class="icon-btn panel-close mobile-only" data-close="libraryPanel" aria-label="Close library">✕</button>
+    </div>
+
+    <div class="duration-block">
+      <label class="field-label" for="durationSlider" data-i18n="sessionLength">Session length</label>
+      <div class="duration-readout"><strong id="durationValue">10</strong> <span data-i18n="minutes">min</span></div>
+      <div class="preset-row" id="durationPresets">
+        <button class="chip" data-min="2" data-i18n="preset2">2 Min Primer</button>
+        <button class="chip" data-min="5" data-i18n="preset5">5 Min Pause</button>
+        <button class="chip is-active" data-min="10" data-i18n="preset10">10 Min Standard</button>
+        <button class="chip" data-min="15" data-i18n="preset15">15 Min Deep</button>
+        <button class="chip" data-min="30" data-i18n="preset30">30 Min</button>
+      </div>
+      <input id="durationSlider" class="range" type="range" min="1" max="60" step="1" value="10" aria-describedby="durationValue">
+      <p class="hint" data-i18n="durationHint">Cue timing scales to the length you choose.</p>
+    </div>
+
+    <div class="library-scroll" id="practiceList" role="listbox" aria-label="Guided practices"></div>
+
+    <div class="library-foot">
+      <button id="startBtn" class="primary-btn">
+        <span aria-hidden="true">▶</span><span data-i18n="beginSession">Begin session</span>
+      </button>
+      <p class="hint center" id="streakHint">—</p>
+    </div>
+  </aside>
+
+  <section class="stage-hud" aria-live="polite">
+    <div id="cueCard" class="cue-card">
+      <span class="cue-index" id="cueIndex">—</span>
+      <p id="cueText" data-i18n="cueIdle">Choose a practice, then let the sky hold what you notice.</p>
+    </div>
+
+    <div class="mode-caption">
+      <span id="modeCaptionTitle" data-i18n="captionSkyTitle">Clouds in the Sky</span>
+      <span class="dot" aria-hidden="true">·</span>
+      <span id="modeCaptionText" data-i18n="captionSkyText">Label a thought and watch it drift beyond the horizon.</span>
+    </div>
+
+    <div id="mainHud" class="hud">
+      <div class="hud-top">
+        <span id="phaseLabel" class="phase" data-i18n="phaseReady">Ready</span>
+        <div class="time-wrap"><span id="timeLabel">10:00</span><span class="time-total" id="timeTotal">/ 10:00</span></div>
+      </div>
+      <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      <div class="hud-bottom">
+        <div class="breath-wrap">
+          <span class="breath-orb-sm" id="breathOrbSm" aria-hidden="true"></span>
+          <span id="breathLabel" data-i18n="breathReady">Breathe naturally</span>
+        </div>
+        <div class="transport">
+          <button id="pauseBtn" class="round-btn" disabled aria-label="Pause session">⏸</button>
+          <button id="endBtn" class="round-btn danger" disabled aria-label="End session">⏹</button>
+        </div>
+        <div class="session-meta"><span id="sessionSeed">—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <aside id="logPanel" class="panel panel-right" aria-label="Observer log">
+    <div class="panel-head">
+      <h2 data-i18n="logTitle">Observer’s Log</h2>
+      <button class="icon-btn panel-close mobile-only" data-close="logPanel" aria-label="Close log">✕</button>
+    </div>
+
+    <form id="thoughtForm" class="thought-form" autocomplete="off">
+      <label class="field-label" for="thoughtInput" data-i18n="thoughtLabel">What’s on your mind?</label>
+      <textarea id="thoughtInput" rows="2" maxlength="140" data-i18n-ph="thoughtPlaceholder" placeholder="e.g. I should be doing more…"></textarea>
+      <div class="category-row" role="group" aria-label="Thought category">
+        <button type="button" class="cat-btn is-active" data-cat="thought">💭 <span data-i18n="catThought">Thought</span></button>
+        <button type="button" class="cat-btn" data-cat="emotion">💙 <span data-i18n="catEmotion">Emotion</span></button>
+        <button type="button" class="cat-btn" data-cat="body">🫀 <span data-i18n="catBody">Body</span></button>
+      </div>
+      <p id="reframePreview" class="reframe-preview" data-i18n="reframeEmpty">Your entry will be reframed as an observed event.</p>
+      <button type="submit" class="primary-btn ghost" data-i18n="addToScene">Release into the scene</button>
+    </form>
+
+    <div class="log-list-head">
+      <h3><span data-i18n="recentNotes">Recent notes</span> <span id="logCount" class="count">0</span></h3>
+      <button id="clearLogBtn" class="text-btn" data-i18n="clear">Clear</button>
+    </div>
+    <ul id="logList" class="log-list"></ul>
+
+    <div class="panel-foot">
+      <button id="exportBtn" class="secondary-btn" data-i18n="exportLog">💾 Export mind-watching log</button>
+      <p class="hint" data-i18n="privacyHint">Everything stays in this browser. Nothing is uploaded.</p>
+    </div>
+  </aside>
+</main>
+
+<div id="scrim" class="scrim"></div>
+
+<dialog id="settingsDialog" class="sheet" aria-labelledby="settingsTitle">
+  <form method="dialog" class="sheet-inner">
+    <div class="sheet-head">
+      <h2 id="settingsTitle" data-i18n="settingsTitle">Settings</h2>
+      <button class="icon-btn" value="close" aria-label="Close settings">✕</button>
+    </div>
+
+    <section class="settings-group">
+      <h3 data-i18n="voiceTitle">Narration voice</h3>
+      <label class="field-label" for="voiceSelect" data-i18n="voiceLabel">Voice</label>
+      <select id="voiceSelect"></select>
+      <div class="two-col">
+        <label class="slider-label"><span data-i18n="rate">Rate</span><output id="rateValue">0.9</output>
+          <input id="rateRange" class="range" type="range" min="0.5" max="1.4" step="0.05" value="0.9">
+        </label>
+        <label class="slider-label"><span data-i18n="pitch">Pitch</span><output id="pitchValue">1.0</output>
+          <input id="pitchRange" class="range" type="range" min="0.6" max="1.4" step="0.05" value="1.0">
+        </label>
+      </div>
+      <label class="switch-row"><input id="ttsMute" type="checkbox"><span data-i18n="muteNarration">Mute spoken narration</span></label>
+      <button id="testVoiceBtn" type="button" class="secondary-btn" data-i18n="testVoice">Test voice</button>
+    </section>
+
+    <section class="settings-group">
+      <h3 data-i18n="gongTitle">Gong</h3>
+      <div class="two-col">
+        <label class="slider-label"><span data-i18n="gongPitch">Pitch</span><output id="gongPitchValue">180 Hz</output>
+          <input id="gongPitch" class="range" type="range" min="100" max="440" step="5" value="180">
+        </label>
+        <label class="slider-label"><span data-i18n="gongDecay">Decay</span><output id="gongDecayValue">6.0 s</output>
+          <input id="gongDecay" class="range" type="range" min="1" max="10" step="0.5" value="6">
+        </label>
+      </div>
+      <label class="slider-label"><span data-i18n="gongVolume">Strike volume</span><output id="gongVolumeValue">70%</output>
+        <input id="gongVolume" class="range" type="range" min="0" max="1" step="0.05" value="0.7">
+      </label>
+      <button id="testGongBtn" type="button" class="secondary-btn" data-i18n="testGong">Strike the gong</button>
+    </section>
+
+    <section class="settings-group">
+      <h3 data-i18n="ambienceTitle">Ambience</h3>
+      <label class="field-label" for="ambienceSelect" data-i18n="ambienceLabel">Soundscape</label>
+      <select id="ambienceSelect">
+        <option value="off" data-i18n="ambOff">Off</option>
+        <option value="rain" data-i18n="ambRain">Gentle rain</option>
+        <option value="forest" data-i18n="ambForest">Forest wind</option>
+      </select>
+      <label class="slider-label"><span data-i18n="ambienceVolume">Ambience volume</span><output id="ambienceVolumeValue">35%</output>
+        <input id="ambienceVolume" class="range" type="range" min="0" max="1" step="0.05" value="0.35">
+      </label>
+      <label class="field-label" for="binauralSelect" data-i18n="binauralLabel">Binaural tone</label>
+      <select id="binauralSelect">
+        <option value="off" data-i18n="binOff">Off</option>
+        <option value="alpha" data-i18n="binAlpha">Alpha — 10 Hz</option>
+        <option value="theta" data-i18n="binTheta">Theta — 6 Hz</option>
+      </select>
+      <label class="field-label" for="breathSelect" data-i18n="breathPatternLabel">Breathing pattern</label>
+      <select id="breathSelect">
+        <option value="box" data-i18n="breathBox">Box breathing — 4·4·4·4</option>
+        <option value="478" data-i18n="breath478">4·7·8 relaxing breath</option>
+        <option value="calm" data-i18n="breathCalm">Calming breath — 4·2·6</option>
+      </select>
+      <label class="switch-row"><input id="autoAmbience" type="checkbox"><span data-i18n="autoAmbience">Start ambience with each session</span></label>
+    </section>
+
+    <section class="settings-group">
+      <h3 data-i18n="dataTitle">Your data</h3>
+      <p class="hint" data-i18n="dataHint">Practice history is stored only in this browser’s localStorage.</p>
+      <div class="button-row">
+        <button id="exportBtnSettings" type="button" class="secondary-btn" data-i18n="exportLog">💾 Export mind-watching log</button>
+        <button id="importBtn" type="button" class="secondary-btn" data-i18n="importLog">Import JSON</button>
+        <button id="resetBtn" type="button" class="secondary-btn danger-text" data-i18n="resetData">Reset all data</button>
+      </div>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+    </section>
+
+    <section class="settings-group credits">
+      <h3 data-i18n="creditsTitle">Credits</h3>
+      <p data-i18n="creditsText">Built with OpenCode and DeepSeek V4.1 Flash. Three.js rendering, Web Speech narration and Web Audio synthesis — no backend, no tracking.</p>
+      <p class="hint">Serenity 3D v1.0.0 · MIT License</p>
+    </section>
+  </form>
+</dialog>
+
+<dialog id="helpDialog" class="sheet" aria-labelledby="helpTitle">
+  <form method="dialog" class="sheet-inner">
+    <div class="sheet-head">
+      <h2 id="helpTitle" data-i18n="helpTitle">How to practise</h2>
+      <button class="icon-btn" value="close" aria-label="Close help">✕</button>
+    </div>
+    <ol class="help-list">
+      <li data-i18n="help1">Choose a visualization: clouds for expansive awareness, a stream for non-attachment, or the orb for breath-led grounding.</li>
+      <li data-i18n="help2">Pick one of the twenty practices and a session length. Cues scale evenly into the time you chose.</li>
+      <li data-i18n="help3">When a thought pulls at you, type it and choose Thought, Emotion or Body. It is reframed as “I notice…” and released into the scene.</li>
+      <li data-i18n="help4">Follow the narration, or mute it and read the cue card. Breathe with the small orb if you chose the sanctuary.</li>
+      <li data-i18n="help5">End the session to record your streak. Export the JSON log any time from Settings.</li>
+    </ol>
+    <div class="help-note">
+      <p data-i18n="helpNote">This is a self-reflection tool, not medical care. If thoughts feel overwhelming, step away and reach out to someone you trust or a qualified professional.</p>
+    </div>
+    <div class="help-credits">
+      <p>Serenity 3D · v1.0.0 · MIT</p>
+      <p data-i18n="helpCredit">Created with OpenCode + DeepSeek V4.1 Flash. Source and reproduction guide included in the repository.</p>
+      <p><kbd>Space</kbd> start/pause · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> switch worlds · <kbd>Esc</kbd> close panels</p>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" crossorigin="anonymous"></script>
+<script src="script.js"></script>
+</body>
+</html>
